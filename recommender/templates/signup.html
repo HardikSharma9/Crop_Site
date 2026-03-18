@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Signup {% endblock %}
+
+{% block content %}
+
+<!-- FIX 1 -->
+<div class="row justify-content-center">
+
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 overflow-hidden">
+        <div class="row">
+
+            <div class="col-md-6 position-relative d-none d-md-block" style="background: url('/static/images/carousel3.png') center/cover no-repeat;">
+                <div class="position-absolute start-0 top-0 w-100 h-100" style="background: linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.5));">
+                </div>
+
+                <div class="position-absolute bottom-0 p-4 text-white">
+                   <h4 class="fw-bold mb-2">Create Your Account</h4> 
+                   <p class="mb-3 text-white-50">Predict Crops, Save History, Export CSV - All in one dashboard</p>
+
+                    <ul class="small list-unstyled mb-0">
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i> Secure & private</li>
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i>Fast ML predictions</li>
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i>Modern responsive UI</li>
+                </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="p-5">
+
+                    <h3 class="mb-3"><i class="fa-solid fa-user-plus"></i> Create Account</h3>
+
+                    <!-- FIX 2 -->
+                    <form method="post" action="{% url 'signup' %}" id="signupForm">
+
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+
+                            <div class="col-md-12">
+                                <label class="form-label">Full Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g, Test User" required/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Phone</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                    <input type="number" name="phone" class="form-control" placeholder="91535*****" required/>
+                                </div>
+                            </div>
+
+                             <div class="col-md-12">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="test@example.com" required/>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Password <span class="text-muted small">(min 6 chars)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                    <input type="password" name="password" id="pwd1" class="form-control" placeholder="********" required/>
+                                      <button class="btn btn-outline-secondary" type="button" id="togglePwd1" title="Show/Hide">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Confirm Password</label>
+
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-shield"></i></span>
+
+                                    <!-- FIX 3 -->
+                                    <input type="password" name="confirm_password" id="pwd2" class="form-control" placeholder="********" required/>
+                                       <button class="btn btn-outline-secondary" type="button" id="togglePwd2" title="Show/Hide">
+                                        <i class="fa-regular fa-eye"></i>
+                                       </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+
+                                <div class="form-check">
+
+                                    <input type="checkbox" id="agree" class="form-check-input" required/>
+                                    <label class="form-check-label">I agree to the <a href="">Terms & Conditions</a></label>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-success mt-3 w-100" type="submit">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Create Account</span>
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <span class="text-muted small">Already have an account?</span>
+                            <a href="{% url 'login' %}" class="small text-decoration-none ms-1">
+                                <i class="fa-solid fa-right-to-bracket"></i> Login
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const toggle = (btnId,inpId) =>{
+        document.getElementById(btnId).addEventListener('click',function(){
+            const f =document.getElementById(inpId);
+            const icon = this.querySelector('i');
+
+            if(!f) return;
+
+            f.type = (f.type == 'password') ? 'text' : 'password';
+            icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+
+        });
+    };
+    toggle('togglePwd1','pwd1');
+    toggle('togglePwd2','pwd2');
+</script>
+{% endblock %}

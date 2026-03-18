@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} HOME {% endblock %}
+
+{% block content %}
+{% load static %}
+
+
+<section class="hero-gradient rounded-4 p-4 mb-5 text-white">
+    <div class="row align-items-center">
+
+        <!-- LEFT CONTENT -->
+        <div class="col-lg-7">
+            <h1 class="display-5 fw-bold mb-2">Smart Crop Recommender</h1>
+
+            <p class="lead text-white-50 mb-3">
+                Enter soil & weather parameters to get instant, ML powered crop suggestions.
+                Clean UI, secure accounts, and detailed history — all in one place.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                {% if user.is_authenticated and user.is_staff %}
+
+                <a href="" class="btn btn-light">
+                    <i class="fa-solid fa-gauge"></i> Admin Dashboard
+                </a>
+
+                <a href="" class="btn btn-outline-light">
+                    <i class="fa-solid fa-table"></i> View Predictions
+                </a>
+
+                {% elif user.is_authenticated and not user.is_staff %}
+
+                <a href="" class="btn btn-light">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Now
+                </a>
+
+                <a href="" class="btn btn-outline-light">
+                    <i class="fa-solid fa-clock-rotate-left"></i> My History
+                </a>
+
+                {% else %}
+
+                <a href="" class="btn btn-light">
+                    <i class="fa-solid fa-right-to-bracket"></i> User Login
+                </a>
+
+                <a href="" class="btn btn-outline-light">
+                    <i class="fa-solid fa-user-plus"></i> Create Account
+                </a>
+
+                <a href="" class="btn btn-outline-light">
+                    <i class="fa-solid fa-lock"></i> Admin Login
+                </a>
+
+                {% endif %}
+            </div>
+
+            <div class="mt-3 small text-white-50">
+                <i class="fa-solid fa-shield-halved me-1"></i>
+                Your predictions are saved privately in your account.
+            </div>
+        </div>
+
+        <!-- RIGHT IMAGE -->
+        <div class="col-lg-5 text-center">
+            <img src="{% static 'images/about.png' %}"
+                 class="img-fluid rounded-4 shadow-lg"
+                 style="max-height:350px;">
+        </div>
+
+    </div>
+    <div class="row g-3 mt-4" >
+         <div class="col-sm-6 col-lg-3">
+               <div class="stat-tile">
+                     <div class="state-title">Users</div>
+                     <div class="state-value">{{total_users}}</div>
+               </div>
+         </div>
+             <div class="col-sm-6 col-lg-3">
+               <div class="stat-tile">
+                     <div class="state-title">Predictions</div>
+                     <div class="state-value">{{total_predictions}}</div>
+               </div>
+         </div>
+    </div>
+</section>
+
+
+
+
+<!-- MODULES -->
+<section class="mb-5">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">What’s inside</h2>
+        <p class="text-muted mb-0">Key modules you get out of the box</p>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- User Module -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-badge me-3">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <h4 class="mb-0">User Module</h4>
+                    </div>
+
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Signup & Login</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Crop Recommendation Prediction</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>View Prediction History + CSV Export</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Edit Profile & Change Password</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Secure Logout</li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Module -->
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-badge me-3">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h4 class="mb-0">Admin Module</h4>
+                    </div>
+
+                    <ul class="list-unstyled text-muted mb-0">
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Admin Login & Secure Dashboard</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Top-crops & 7-day Charts</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>View Users & Predictions</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Table Filters + CSV Exports</li>
+                        <li class="mb-2"><i class="fa-solid fa-circle-check text-success me-2"></i>Delete Entries (SweetAlert confirm)</li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- TECHNOLOGIES -->
+<section class="mb-5">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Technologies</h2>
+        <p class="text-muted mb-0">Built with modern, reliable tools</p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-brands fa-python me-1"></i>Django (Python)
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-solid fa-brain me-1"></i>Scikit-learn (RandomForest)
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-brands fa-bootstrap me-1"></i>Bootstrap 5
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-solid fa-icons me-1"></i>FontAwesome
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-regular fa-bell me-1"></i>SweetAlert2
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-solid fa-chart-simple me-1"></i>Chart.js
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-solid fa-table me-1"></i>simple-datatables
+                </span>
+
+                <span class="badge bg-success-subtle text-success border">
+                    <i class="fa-solid fa-database me-1"></i>SQLite / PostgreSQL
+                </span>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+<!-- HOW IT WORKS -->
+<section class="mb-5">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">How it works</h2>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Step 1 -->
+        <div class="col-md-4">
+            <div class="step card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="step-num">1</div>
+                    <h5>Enter Parameters</h5>
+                    <p class="text-muted mb-0">
+                        N, P, K, temperature, humidity, pH, rainfall.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="col-md-4">
+            <div class="step card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="step-num">2</div>
+                    <h5>ML Prediction</h5>
+                    <p class="text-muted mb-0">
+                        Random Forest model suggests the best crop.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="col-md-4">
+            <div class="step card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="step-num">3</div>
+                    <h5>Save & Export</h5>
+                    <p class="text-muted mb-0">
+                        History stored in your account; export as CSV.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer class="mt-5 footer-gradient text-white rounded-top-4 rounded-bottom-4">
+
+    <div class="container py-4">
+        <div class="row align-items-center">
+
+            <div class="col-md-6">
+                <div class="fw-semibold">Crop Recommender</div>
+                <div class="small text-white-50">
+                    ML-powered crop suggestion system
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <div class="small">
+                    &copy; Designed & developed with
+                <span class="text-danger"><i class="fa-solid fa-heart"></i></span> 
+                 by Hardik Sharma & Himani Vaishnav. 
+                </div>
+            </div>
+          </div>
+       </div>
+
+</footer>
+
+{% endblock %}

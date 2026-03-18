@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Predict {% endblock %}
+
+{% block content %}
+<div>
+    <h3 class="text-center"><i class="fa-solid fa-clock-rotate-left"></i>
+        Prediction History
+    </h3>
+    <table class="table">
+      <thead class="table-success">
+        <tr>
+            <th>Prediction Date</th>
+            <th>Crop</th>
+            <th>N</th>
+            <th>P</th>
+            <th>K</th>
+            <th>Temperature</th>
+            <th>PH</th>
+            <th>Humidity</th>
+            <th>Rainfall</th>
+            <th>Action</th>
+        
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in predictions %}
+             <tr>
+            <td>{{p.created_at|date:"d M Y H:i A"}}</td>
+            <td><span class="badge bg-success">{{p.predicted_label|title}}</span></td>
+            <td>{{p.N}}</td>
+            <td>{{p.P}}</td>
+            <td>{{p.K}}</td>
+            <td>{{p.Temperature}}</td>
+            <td>{{p.PH}}</td>
+            <td>{{p.Humidity}}</td>
+            <td>{{p.Rainfall}}</td>
+            <td><a href="{% url 'user_delete_prediction' p.id %}" class="btn btn-outline-danger"onclick="return confirm('Delete this entry? This cannot be undone')">
+                <i class="fa-solid fa-trash"></i>
+            </a></td>
+        
+        </tr>
+        {% endfor %}
+      </tbody>
+    
+    </table>
+</div>
+
+{% endblock %}

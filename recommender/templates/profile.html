@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+<title>{% block title %} Profile {% endblock %}</title>
+{% block content %}
+
+
+
+<div class="row align-items-start">
+
+    <!-- LEFT SIDE : PROFILE FORM -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 p-4">
+
+            <h3 class="mb-4">
+                <i class="fa fa-user-edit"></i> Edit Profile
+            </h3>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" value="Hardik sharma">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" value="9153530052">
+                </div>
+
+                <p class="text-muted">hardiksharma9153@gmail.com</p>
+
+                <button class="btn btn-success w-100">
+                    <i class="fa fa-save"></i> Save Changes
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- RIGHT SIDE : AI IMAGE -->
+    <div class="col-lg-5">
+        <div class="profile-image-card">
+
+            <div class="image-wrapper">
+                <img src="{% static 'images/farmer.png' %}"
+                     class="profile-side-image"
+                     alt="Smart Farming AI">
+
+                <div class="image-overlay">
+                    <h4>AI Crop Intelligence</h4>
+                    <p>
+                        Smart prediction system analyzing soil,
+                        weather and crop data to guide farmers
+                        towards the most profitable crops.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Login {% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-centre">
+    <div class="col-lg-10">
+        <div class="card shadow-lg border-0 overflow-hidden">
+        <div class="row">
+            <div class="col-md-6 position-relative d-none d-md-block" style="background: url('/static/images/carousel4.png') center/cover no-repeat;">
+                <div class="position-absolute start-0 top-0 w-100 h-100" style="background: linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.5));">
+
+                </div>
+                <div class="position-absolute bottom-0 p-4 text-white">
+                   <h4 class="fw-bold mb-2">Crop Recommender</h4> 
+                   <p class="mb-3 text-white-50">Predict Crops, Save History, Export CSV - All in one dashboard</p>
+                    <ul class="small list-unstyled mb-0">
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i> Secure & private</li>
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i>Fast ML predictions</li>
+                    <li class="mb-1"><i class="fa-solid fa-circle-check me-2"></i>Modern responsive UI</li>
+                </ul>
+                </div>
+               
+            </div>
+            <div class="col-md-6">
+                <div class="p-5">
+                    <h3 class="mb-3"><i class="fa-solid fa-right-to-bracket"></i> User Login</h3>
+                    <form method="post" id="loginForm">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                             <div class="col-md-12">
+                                <label class="form-label">Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-envelope"></i></span>
+                                    <input type="email" name="email" class="form-control" placeholder="test@example.com" required/>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Password <span class="text-muted small">(min 6 chars)</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                                    <input type="password" name="password" id="pwd1" class="form-control" placeholder="********" required/>
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePwd" title="Show/Hide">
+                                        <i class="fa-regular fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+
+                        </div>
+                        <button class="btn btn-success mt-3 w-100" type="submit" id="signupBtn">
+                            <i class=" fa-solid fa-right-to-bracket"></i>
+                            <span>Login</span>
+                        </button>
+                        <div class="text-center mt-3">
+                            <span class="text-muted small">New here?</span>
+                            <a href="{% url 'signup' %}" class="small text-decoration-none ms-1"><i class="fa-solid fa-user-plus"></i> Create an account</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    const toggle = (btnId,inpId) =>{
+        document.getElementById(btnId).addEventListener('click',function(){
+            const f =document.getElementById(inpId);
+            const icon = this.querySelector('i');
+
+            if(!f) return;
+
+            f.type = (f.type == 'password') ? 'text' : 'password';
+            icon.classList.toggle('fa-eye'); icon.classList.toggle('fa-eye-slash');
+
+        });
+    };
+    toggle('togglePwd','pwd1');
+    
+</script>    
+{% endblock %}

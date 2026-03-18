@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Predict {% endblock %}
+
+{% block content %}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3><i class="fa-solid fa-flask"></i> Crop Recommendation</h3>
+
+                    <div class="text-muted small d-none d-md-block">
+                        <i class="fa-solid fa-circle-info"></i>
+                        Enter numeric values [ Humidity: 0-100, PH: 1-14 ]
+                    </div>
+                </div>
+
+                <hr>
+
+                <form method="POST" class="predictForm" id="predictForm">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+
+                        {% for c in feature_order %}
+
+                        <div class="col-md-4">
+
+                            <label class="form-label text-uppercase">{{ c }}</label>
+
+                            {% if c == "humidity" %}
+                            <input type="number" min="0" max="100" step="any" name="{{ c }}" class="form-control" placeholder="0-100"/>
+                            
+                            {% elif c == "ph" %}
+                            <input type="number" min="0" max="14" step="any" name="{{ c }}" class="form-control" placeholder="0-14"/>
+                            
+                            {% else %}
+                            <input type="number" min="0" step="any" name="{{ c }}" class="form-control" placeholder="e.g 60"/>
+                            
+                            {% endif %}
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+
+                        <button class="btn btn-success" type="submit">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Predict
+                        </button>
+
+                        <button class="btn btn-outline-secondary" type="button" id="btnSample">
+                            <i class="fa-solid fa-bolt"></i> Use Sample
+                        </button>
+
+                        <button class="btn btn-outline-danger" type="reset" >
+                            <i class="fa-solid fa-arrow-rotate-left"></i>Reset
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                {% if result %}
+
+                <hr/>
+
+                <div class="alert alert-success">
+                    Recommended Crop: <strong>{{ result|title }}</strong>
+                </div>
+
+                {% endif %}
+
+
+                {% if last_data %}
+
+                <div class="small text-muted">
+
+                    <i class="fa-regular fa-clock"></i> Input used:
+
+                    {% for k,v in last_data.items %}
+                        <code>{{k}}={{v}}</code>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+
+                </div>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="mb-2"><i class="fa-solid fa-lightbulb"></i> Tips</h5>
+          <ul class="small text-muted mb-0">
+            <li>Use realistic local values for temperature, humidity & rainfall.</li>
+            <li>Soil pH valid range 0-14 (most crops prefer ~6-7).</li>
+            <li>Save multiple predictions and compare in your History.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card shadow-sm border-0 mt-3">
+       <div class="card-body" >
+         <h6 class="mb-2"><i class="fa-solid fa-circle-question"></i> What is N-P-K?</h6>
+        <p class="small text-muted mb-9">
+          N (Nitrogen), P (Phosphorus), K (Potassium) - key soil nutrients affecting crop growth.
+        </p>
+       </div>
+      </div>
+ </div> 
+
+</div>
+<script>
+    
+(function(){ //IIFE (Immediately Invoked Function Expression)
+const form = document.getElementById('predictForm')
+const inputs = form ? form.querySelectorAll('input[name]'):[];
+
+const sample ={N:90, P:40, K:40, temperature:20, humidity:80,ph:7,rainfall:200 }
+document.getElementById('btnSample').addEventListener('click',() =>{
+    inputs.forEach(inp=>{
+        const key=inp.name;
+        if(sample[key] !== undefined) inp.value = sample[key];
+    })
+    Swal.fire({icon:'info',title:'Sample filled'});
+})
+})();
+</script>
+{% endblock %}
