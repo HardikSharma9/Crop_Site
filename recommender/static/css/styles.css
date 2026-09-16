@@ -65,3 +65,34 @@ display: inline-flex; align-items: center; justify-content: center;
 
 .card{ border-radius:  1rem; }
 .btn{  border-radius: .8rem; }
+
+
+/*CHATBOT*/
+
+#chat-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2e7d32;
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#chat-box {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    background: #e8f5e9;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#chat-messages {
+    height: 200px;
+    overflow-y: auto;
+    background: white;
+    margin-bottom: 10px;
+}

@@ -1,121 +1,948 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
- 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %} Crop Recommender {% endblock %}</title>
 
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/css/bootstrap.min.css" integrity="sha512-Ez0cGzNzHR1tYAv56860NLspgUGuQw16GiOOp/I2LuTmpSK9xDXlgJz3XN4cnpXWDmkNBKXR/VDMTCnAaEooxA==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="/static/css/styles.css" />
-</head>
-<body>
 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+      /* =========================================================
+         FARM AI CHATBOT INTERFACE
+         ========================================================= */
+      #farm-ai-button {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        width: 58px;
+        height: 58px;
+        border: none;
+        border-radius: 18px;
+        background: linear-gradient(145deg, #198754, #0f5132);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 10px 28px rgba(25, 135, 84, 0.35);
+        z-index: 9990;
+        transition: 0.25s ease;
+      }
+      #farm-ai-button:hover {
+        transform: translateY(-3px) scale(1.03);
+      }
+      #farm-ai-button i {
+        font-size: 24px;
+      }
+
+      .farm-ai-spark {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 11px;
+        height: 11px;
+        background: #ffc107;
+        border: 2px solid #fff;
+        border-radius: 50%;
+      }
+
+      #farm-ai-window {
+        position: fixed;
+        right: 24px;
+        bottom: 92px;
+        width: 440px;
+        max-width: calc(100vw - 32px);
+        height: min(640px, calc(100vh - 120px));
+        background: #ffffff;
+        border: 1px solid #e1ebe5;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 10000;
+        transition:
+          width 0.25s ease,
+          height 0.25s ease;
+      }
+
+      /* 50% Screen Width & 100% Full Height Mode */
+      #farm-ai-window.maximized {
+        width: 50vw !important;
+        max-width: 50vw !important;
+        height: 100vh !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: -8px 0 35px rgba(0, 0, 0, 0.2) !important;
+      }
+
+      #farm-ai-header {
+        padding: 14px 18px;
+        background: linear-gradient(135deg, #198754, #126b42);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .farm-ai-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .farm-ai-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .farm-ai-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .farm-ai-status {
+        font-size: 11px;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .farm-ai-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #6bff98;
+      }
+
+      .farm-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .farm-h-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.15s ease;
+      }
+      .farm-h-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      #farm-ai-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+        background: #f7faf8;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .farm-message {
+        display: flex;
+        flex-direction: column;
+        max-width: 95%;
+      }
+      .farm-message.user {
+        align-self: flex-end;
+        align-items: flex-end;
+      }
+      .farm-message.bot {
+        align-self: flex-start;
+        align-items: flex-start;
+      }
+
+      .farm-bubble {
+        padding: 12px 14px;
+        font-size: 13.5px;
+        line-height: 1.6;
+        border-radius: 14px;
+        word-break: break-word;
+        max-width: 100%;
+        overflow-wrap: break-word;
+      }
+      .farm-message.user .farm-bubble {
+        background: #198754;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+      .farm-message.bot .farm-bubble {
+        background: #ffffff;
+        color: #212529;
+        border: 1px solid #e3eae5;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      /* Markdown & Table Scrolling */
+      .farm-bubble p {
+        margin-bottom: 8px;
+      }
+      .farm-bubble p:last-child {
+        margin-bottom: 0;
+      }
+      .farm-bubble ul,
+      .farm-bubble ol {
+        margin: 6px 0;
+        padding-left: 20px;
+      }
+      .farm-bubble li {
+        margin-bottom: 4px;
+      }
+      .farm-bubble strong {
+        color: #0d5130;
+        font-weight: 700;
+      }
+      .farm-message.user .farm-bubble strong {
+        color: #fff;
+      }
+
+      .farm-bubble .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        margin: 8px 0;
+        border-radius: 8px;
+        border: 1px solid #d4ded7;
+      }
+      .farm-bubble table {
+        width: 100%;
+        min-width: 320px;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .farm-bubble th,
+      .farm-bubble td {
+        border: 1px solid #e1e9e3;
+        padding: 6px 9px;
+        text-align: left;
+        vertical-align: top;
+      }
+      .farm-bubble th {
+        background: #eef5f0;
+        color: #145a32;
+        font-weight: 700;
+      }
+      .farm-bubble tr:nth-child(even) {
+        background: #fbfdfc;
+      }
+
+      /* Actions Toolbar */
+      .farm-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .farm-act-btn {
+        background: #edf3ef;
+        border: 1px solid #d8e4dc;
+        border-radius: 6px;
+        font-size: 11px;
+        padding: 3px 8px;
+        color: #3b5043;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: 0.15s ease;
+      }
+      .farm-act-btn:hover {
+        background: #d8ebd0;
+        color: #198754;
+      }
+      .farm-act-btn.speaking {
+        background: #ffe8e8;
+        color: #dc3545;
+        border-color: #f5c2c7;
+      }
+
+      /* Image Output Card */
+      .farm-img-box {
+        background: #fff;
+        border: 1px solid #d8e5dd;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 4px;
+      }
+      .farm-img-box img {
+        width: 100%;
+        max-height: 320px;
+        object-fit: cover;
+        display: block;
+      }
+      .farm-img-box span {
+        display: block;
+        padding: 8px 12px;
+        font-size: 11.5px;
+        color: #55675d;
+        background: #fafcfb;
+      }
+
+      /* Chat Input Bar */
+      #farm-ai-input-area {
+        padding: 10px 14px;
+        background: #fff;
+        border-top: 1px solid #e7eee9;
+      }
+      .farm-input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #f4f8f5;
+        border: 1px solid #d7e4dc;
+        border-radius: 14px;
+        padding: 4px 6px;
+      }
+      .farm-input-wrap:focus-within {
+        border-color: #198754;
+        background: #fff;
+      }
+      #farm-ai-language {
+        border: none;
+        background: transparent;
+        font-size: 12.5px;
+        color: #334d3f;
+        outline: none;
+        max-width: 95px;
+      }
+      #farm-ai-input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 13.5px;
+        padding: 6px 6px;
+      }
+      .farm-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      #farm-ai-mic {
+        background: transparent;
+        color: #198754;
+        font-size: 16px;
+      }
+      #farm-ai-mic.listening {
+        background: #ffe3e3;
+        color: #dc3545;
+        animation: micPulse 1s infinite alternate;
+      }
+      @keyframes micPulse {
+        to {
+          transform: scale(1.1);
+        }
+      }
+      #farm-ai-send {
+        background: #198754;
+        color: #fff;
+        font-size: 14px;
+      }
+      #farm-ai-send:disabled {
+        opacity: 0.5;
+      }
+
+      .farm-v-status {
+        display: none;
+        font-size: 11px;
+        color: #dc3545;
+        padding-top: 4px;
+        padding-left: 4px;
+      }
+
+      @media (max-width: 768px) {
+        #farm-ai-window.maximized {
+          width: 100vw !important;
+          max-width: 100vw !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
-  <div class="container">
-    <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-wheat-awn"></i> Crop Recommender</a>
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#"
+          ><i class="fa-solid fa-wheat-awn"></i> Crop Recommender</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto">
+            {% if user.is_authenticated and not user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'predict' %}"
+                ><i class="fa-solid fa-flask"></i> Predict</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'user_history' %}"
+                ><i class="fa-solid fa-clock-rotate-left"></i> History</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'profile' %}"
+                ><i class="fa-solid fa-user"></i> Profile</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'change_password' %}"
+                ><i class="fa-solid fa-key"></i> Password</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'logout' %}"
+                ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+              >
+            </li>
+            {% elif user.is_authenticated and user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'admin_dashboard' %}"
+                ><i class="fa-solid fa-gauge"></i> Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                href="{% url 'admin_view_predictions' %}"
+                ><i class="fa-solid fa-table"></i> Predictions</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'admin_users_view' %}"
+                ><i class="fa-solid fa-users"></i> Users</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'logout' %}"
+                ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+              >
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'home' %}"
+                ><i class="fa-solid fa-home"></i> Home</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'login' %}"
+                ><i class="fa-solid fa-right-to-bracket"></i> Login</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'signup' %}"
+                ><i class="fa-solid fa-user-plus"></i> Signup</a
+              >
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" >
-      <span class="navbar-toggler-icon"></span>
+    <main class="container py-4">{% block content %} {% endblock %}</main>
+
+    <!-- Floating Trigger -->
+    <button
+      id="farm-ai-button"
+      onclick="toggleFarmAI()"
+      aria-label="Open Farm AI"
+    >
+      <i class="fa-solid fa-seedling"></i>
+      <span class="farm-ai-spark"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto">
+    <!-- Chatbot Window -->
+    <div id="farm-ai-window">
+      <div id="farm-ai-header">
+        <div class="farm-ai-brand">
+          <div class="farm-ai-logo"><i class="fa-solid fa-seedling"></i></div>
+          <div>
+            <div class="farm-ai-title">FarmAI Assistant</div>
+            <div class="farm-ai-status">
+              <span class="farm-ai-status-dot"></span> Online • Agronomist
+            </div>
+          </div>
+        </div>
+        <div class="farm-header-actions">
+          <button
+            class="farm-h-btn"
+            id="farm-ai-maximize"
+            onclick="toggleMaximizeFarmAI()"
+            title="Maximize / Restore"
+          >
+            <i class="fa-solid fa-expand" id="farm-max-icon"></i>
+          </button>
+          <button
+            class="farm-h-btn"
+            id="farm-ai-close"
+            onclick="toggleFarmAI()"
+            title="Close"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
 
-    {% if user.is_authenticated and not user.is_staff %}
+      <div id="farm-ai-messages">
+        <div class="farm-message bot">
+          <div class="farm-bubble">
+            👋 <strong>Namaste!</strong> I am your FarmAI agricultural
+            assistant.<br />
+            Ask me about crops, fertilizers, pest control, soil types, or say
+            <em>"Show picture of sugarcane"</em>.
+          </div>
+        </div>
+      </div>
 
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'predict' %}"><i class="fa-solid fa-flask"></i> Predict</a>
-        </li>
-
-         <li class="nav-item">
-          <a class="nav-link active" href="{% url 'user_history' %}"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'profile' %}"><i class="fa-solid fa-user"></i> Profile</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'change_password' %}"><i class="fa-solid fa-key"></i> Change Password</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-        </li>
-
-    {% elif user.is_authenticated and user.is_staff %}
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_dashboard' %}"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-        </li>
-
-         <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_view_predictions' %}"><i class="fa-solid fa-table"></i> Predictions</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_users_view' %}"><i class="fa-solid fa-users"></i> Users</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_change_password' %}"><i class="fa-solid fa-key"></i> Change Password</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_logout_view' %}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
-        </li>
-    {% else %}
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'home' %}"><i class="fa-solid fa-home"></i> Home</a>
-        </li>
-
-         <li class="nav-item">
-          <a class="nav-link active" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Signup</a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'admin_login' %}"><i class="fa-solid fa-lock"></i> Admin</a>
-        </li>
-        {% endif %}
-       
-
-      </ul>
-     
+      <div id="farm-ai-input-area">
+        <div class="farm-input-wrap">
+          <select id="farm-ai-language" title="Language">
+            <option value="en-IN">English</option>
+            <option value="hi-IN" selected>Hindi (हिंदी)</option>
+            <option value="hinglish">Hinglish</option>
+            <option value="pa-IN">Punjabi</option>
+            <option value="bn-IN">Bengali</option>
+            <option value="mr-IN">Marathi</option>
+            <option value="gu-IN">Gujarati</option>
+          </select>
+          <input
+            type="text"
+            id="farm-ai-input"
+            placeholder="Ask about farming in Hindi or English..."
+            autocomplete="off"
+          />
+          <button type="button" id="farm-ai-mic" class="farm-btn" title="Speak">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button
+            type="button"
+            id="farm-ai-send"
+            class="farm-btn"
+            onclick="sendFarmMessage()"
+          >
+            <i class="fa-solid fa-arrow-up"></i>
+          </button>
+        </div>
+        <div id="farm-ai-v-status" class="farm-v-status">
+          Listening... Speak now.
+        </div>
+      </div>
     </div>
-  </div>
-</nav>
 
+    <!-- Scripts -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
 
-    <main class="container py-4">
-        {% block content %} {% endblock %}
-    </main>
+    <script>
+      let farmAIContext = "";
+      let farmAIWaiting = false;
+      let availableVoices = [];
 
+      function toggleFarmAI() {
+        const win = document.getElementById("farm-ai-window");
+        const floatBtn = document.getElementById("farm-ai-button");
+        const isOpen = win.style.display === "flex";
 
+        if (isOpen) {
+          win.style.display = "none";
+          floatBtn.style.display = "flex";
+        } else {
+          win.style.display = "flex";
+          floatBtn.style.display = "none";
+          document.getElementById("farm-ai-input").focus();
+        }
+      }
 
+      function toggleMaximizeFarmAI() {
+        const win = document.getElementById("farm-ai-window");
+        const icon = document.getElementById("farm-max-icon");
+        const floatBtn = document.getElementById("farm-ai-button");
 
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.1/js/bootstrap.min.js" integrity="sha512-EKWWs1ZcA2ZY9lbLISPz8aGR2+L7JVYqBAYTq5AXgBkSjRSuQEGqWx8R1zAX16KdXPaCjOCaKE8MCpU0wcHlHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>     -->
+        win.classList.toggle("maximized");
+        floatBtn.style.display = "none";
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        if (win.classList.contains("maximized")) {
+          icon.className = "fa-solid fa-compress";
+        } else {
+          icon.className = "fa-solid fa-expand";
+        }
+        scrollBottom();
+      }
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-{% if messages %}
-<script>
-  {% for m in messages %}
-    Swal.fire({
-      icon:'{{ m.tags|default:"info"}}',
-      title:'{{ m }}'
-    });
-  {% endfor %}  
-</script>
-{% endif %}
+      function scrollBottom() {
+        const el = document.getElementById("farm-ai-messages");
+        el.scrollTop = el.scrollHeight;
+      }
 
-</body>
+      function renderSafeMarkdown(rawMarkdown) {
+        const html = marked.parse(rawMarkdown);
+        return html
+          .replace(/<table>/g, '<div class="table-wrapper"><table>')
+          .replace(/<\/table>/g, "</table></div>");
+      }
+
+      /* Clean Multilingual TTS Engine */
+      function loadVoices() {
+        if ("speechSynthesis" in window) {
+          availableVoices = window.speechSynthesis.getVoices();
+        }
+      }
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+      }
+
+      function speakProfessional(cleanText, localeCode, btn) {
+        if (!("speechSynthesis" in window) || !cleanText) return;
+
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+          if (btn && btn.classList.contains("speaking")) {
+            btn.classList.remove("speaking");
+            btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+            return;
+          }
+        }
+
+        const speakable = cleanText
+          .replace(/[#*_`~>-]/g, " ")
+          .replace(/\|/g, " ")
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        const utterance = new SpeechSynthesisUtterance(speakable);
+        const hasDevanagari = /[\u0900-\u097F]/.test(speakable);
+
+        let targetLocale = localeCode;
+        if (hasDevanagari || localeCode === "hinglish") {
+          targetLocale = "hi-IN";
+        }
+
+        utterance.lang = targetLocale;
+        utterance.rate = 0.95;
+        utterance.pitch = 1.0;
+
+        const targetPrefix = targetLocale.slice(0, 2);
+        const naturalVoice =
+          availableVoices.find(
+            (v) =>
+              v.lang.replace("_", "-").startsWith(targetPrefix) &&
+              (v.name.includes("Google") ||
+                v.name.includes("Swara") ||
+                v.name.includes("Natural") ||
+                v.name.includes("Neural")),
+          ) ||
+          availableVoices.find((v) =>
+            v.lang.replace("_", "-").startsWith(targetPrefix),
+          );
+
+        if (naturalVoice) utterance.voice = naturalVoice;
+
+        if (btn) {
+          btn.classList.add("speaking");
+          btn.innerHTML = '<i class="fa-solid fa-stop"></i> Stop';
+          utterance.onend = () => {
+            btn.classList.remove("speaking");
+            btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+          };
+          utterance.onerror = () => {
+            btn.classList.remove("speaking");
+            btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+          };
+        }
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function attachActionButtons(botMessageRow, textForSpeech) {
+        const actions = document.createElement("div");
+        actions.className = "farm-actions";
+
+        const listenBtn = document.createElement("button");
+        listenBtn.type = "button";
+        listenBtn.className = "farm-act-btn";
+        listenBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        listenBtn.onclick = () => {
+          const locale = document.getElementById("farm-ai-language").value;
+          speakProfessional(textForSpeech, locale, listenBtn);
+        };
+
+        const likeBtn = document.createElement("button");
+        likeBtn.type = "button";
+        likeBtn.className = "farm-act-btn";
+        likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+        likeBtn.onclick = () => {
+          fetch("{% url 'chatbot_feedback' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "feedback=up",
+          });
+          likeBtn.style.color = "#198754";
+        };
+
+        const dislikeBtn = document.createElement("button");
+        dislikeBtn.type = "button";
+        dislikeBtn.className = "farm-act-btn";
+        dislikeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
+        dislikeBtn.onclick = () => {
+          fetch("{% url 'chatbot_feedback' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "feedback=down",
+          });
+          dislikeBtn.style.color = "#dc3545";
+        };
+
+        actions.appendChild(listenBtn);
+        actions.appendChild(likeBtn);
+        actions.appendChild(dislikeBtn);
+        botMessageRow.appendChild(actions);
+      }
+
+      /* UPDATED IMAGE HANDLING FUNCTION */
+      function appendBotImage(imageData, caption) {
+        const container = document.getElementById("farm-ai-messages");
+        const msg = document.createElement("div");
+        msg.className = "farm-message bot";
+
+        // Check if data is a direct web URL or base64 string
+        const imageSrc = imageData.startsWith("http")
+          ? imageData
+          : `data:image/jpeg;base64,${imageData}`;
+
+        const imgBox = document.createElement("div");
+        imgBox.className = "farm-img-box";
+        imgBox.innerHTML = `
+          <img src="${imageSrc}" alt="FarmAI Agriculture Visual" />
+          <span>${caption || "Agricultural Reference Photograph"}</span>
+        `;
+        msg.appendChild(imgBox);
+        container.appendChild(msg);
+        scrollBottom();
+      }
+
+      function appendUserMessage(text) {
+        const container = document.getElementById("farm-ai-messages");
+        const msg = document.createElement("div");
+        msg.className = "farm-message user";
+        msg.innerHTML = `<div class="farm-bubble">${text}</div>`;
+        container.appendChild(msg);
+        scrollBottom();
+      }
+
+      /* Send Message Handler */
+      async function sendFarmMessage() {
+        if (farmAIWaiting) return;
+        const input = document.getElementById("farm-ai-input");
+        const sendBtn = document.getElementById("farm-ai-send");
+        const message = input.value.trim();
+        if (!message) return;
+
+        const lang = document.getElementById("farm-ai-language").value;
+        appendUserMessage(message);
+        input.value = "";
+
+        farmAIWaiting = true;
+        sendBtn.disabled = true;
+
+        const container = document.getElementById("farm-ai-messages");
+        const typingIndicator = document.createElement("div");
+        typingIndicator.className = "farm-message bot";
+        typingIndicator.innerHTML = `<div class="farm-bubble"><em>FarmAI is researching...</em></div>`;
+        container.appendChild(typingIndicator);
+        scrollBottom();
+
+        try {
+          const bodyData = new URLSearchParams();
+          bodyData.append("message", message);
+          bodyData.append("language", lang);
+          if (farmAIContext) bodyData.append("context", farmAIContext);
+
+          const response = await fetch("{% url 'chatbot' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: bodyData,
+          });
+
+          typingIndicator.remove();
+          const contentType = response.headers.get("content-type") || "";
+
+          // JSON: Image Response
+          if (contentType.includes("application/json")) {
+            const data = await response.json();
+            if (data.type === "image" && data.image) {
+              appendBotImage(data.image, data.message);
+              farmAIContext = `User: ${message}\nFarmAI: [Displayed crop visual for ${message}]`;
+            } else {
+              const row = document.createElement("div");
+              row.className = "farm-message bot";
+              row.innerHTML = `<div class="farm-bubble">${data.message || "I couldn't process that right now."}</div>`;
+              container.appendChild(row);
+            }
+            return;
+          }
+
+          // Streamed Markdown Text
+          const botRow = document.createElement("div");
+          botRow.className = "farm-message bot";
+          const botBubble = document.createElement("div");
+          botBubble.className = "farm-bubble";
+          botRow.appendChild(botBubble);
+          container.appendChild(botRow);
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let fullText = "";
+
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            fullText += decoder.decode(value, { stream: true });
+            botBubble.innerHTML = renderSafeMarkdown(fullText);
+            scrollBottom();
+          }
+
+          attachActionButtons(botRow, botBubble.innerText);
+          farmAIContext = `User: ${message}\nFarmAI: ${fullText}`;
+        } catch (err) {
+          console.error("Chat error:", err);
+          typingIndicator.remove();
+          const errRow = document.createElement("div");
+          errRow.className = "farm-message bot";
+          errRow.innerHTML = `<div class="farm-bubble">⚠️ FarmAI connection error. Please check your network and try again.</div>`;
+          container.appendChild(errRow);
+        } finally {
+          farmAIWaiting = false;
+          sendBtn.disabled = false;
+          input.focus();
+        }
+      }
+
+      /* =========================================================
+         UNLIMITED HARDWARE-LEVEL SPEECH RECOGNITION (ZERO QUOTA)
+         ========================================================= */
+      const micBtn = document.getElementById("farm-ai-mic");
+      const vStatus = document.getElementById("farm-ai-v-status");
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRecognition) {
+        let recognition = new SpeechRecognition();
+        let isRecActive = false;
+
+        micBtn.addEventListener("click", () => {
+          if (isRecActive) {
+            recognition.stop();
+            return;
+          }
+
+          const selectedLang =
+            document.getElementById("farm-ai-language").value;
+          recognition.lang =
+            selectedLang === "hinglish" ? "hi-IN" : selectedLang;
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          try {
+            recognition.start();
+          } catch (e) {
+            try {
+              recognition.abort();
+            } catch (_) {}
+            setTimeout(() => {
+              try {
+                recognition.start();
+              } catch (_) {}
+            }, 100);
+          }
+        });
+
+        recognition.onstart = () => {
+          isRecActive = true;
+          micBtn.classList.add("listening");
+          vStatus.style.display = "block";
+          vStatus.textContent = "Listening... Speak your question clearly.";
+        };
+
+        recognition.onresult = (event) => {
+          if (event.results && event.results.length > 0) {
+            const transcript = event.results[0][0].transcript;
+            if (transcript && transcript.trim()) {
+              document.getElementById("farm-ai-input").value =
+                transcript.trim();
+              sendFarmMessage();
+            }
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.warn("Speech recognition notice:", event.error);
+          vStatus.textContent =
+            "Microphone error or silence. Click mic to retry.";
+          setTimeout(() => {
+            vStatus.style.display = "none";
+          }, 3000);
+        };
+
+        recognition.onend = () => {
+          isRecActive = false;
+          micBtn.classList.remove("listening");
+          vStatus.style.display = "none";
+        };
+      } else {
+        micBtn.title = "Voice recognition requires Chrome, Edge or Brave.";
+      }
+
+      document
+        .getElementById("farm-ai-input")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendFarmMessage();
+          }
+        });
+    </script>
+  </body>
 </html>
