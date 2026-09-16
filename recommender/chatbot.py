@@ -11,6 +11,10 @@ from django.views.decorators.csrf import csrf_exempt
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key) if api_key else None
 
+# Active production models with fallback mechanism
+PRIMARY_MODEL = "gemini-1.5-flash"
+FALLBACK_MODEL = "gemini-1.5-pro"
+
 CROP_IMAGE_MAP = {
     "sugarcane": "https://images.pexels.com/photos/3025215/pexels-photo-3025215.jpeg?auto=compress&cs=tinysrgb&w=800",
     "maize": "https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -56,25 +60,29 @@ def transcribe_audio(audio_bytes, mime_type="audio/webm", language="auto"):
     if not client:
         return "Audio transcription unavailable: GEMINI_API_KEY is not configured."
 
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=[
-                f"Transcribe this spoken audio accurately. Context language: {language}.",
-                {"mime_type": mime_type, "data": audio_bytes},
-            ],
-        )
-        return response.text.strip() if response.text else ""
-    except Exception as e:
-        print(f"Transcription error: {e}")
-        raise e
+    for model_name in [PRIMARY_MODEL, FALLBACK_MODEL]:
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=[
+                    f"Transcribe this spoken audio accurately verbatim. Context language: {language}.",
+                    {"mime_type": mime_type, "data": audio_bytes},
+                ],
+            )
+            return response.text.strip() if response.text else ""
+        except Exception as e:
+            print(f"Transcription error on model {model_name}: {e}")
+            continue
+
+    raise RuntimeError("Audio transcription failed across all models.")
 
 
 def text_to_speech_base64(text, language="en"):
     """Converts input text to base64 audio stream for browser playback."""
     try:
+        clean_text = text.replace("*", "").replace("#", "").replace("`", "")
         lang_code = language.split("-")[0].lower() if language else "en"
-        tts = gTTS(text=text, lang=lang_code, slow=False)
+        tts = gTTS(text=clean_text[:500], lang=lang_code, slow=False)
         fp = io.BytesIO()
         tts.write_to_fp(fp)
         fp.seek(0)
@@ -89,22 +97,35 @@ def get_chat_stream(msg, context="", language="auto"):
         yield f"Here is the agricultural advisory for: **{msg}**\n\nEnsure proper soil testing, crop rotation, and balanced fertilizer usage for best yield."
         return
 
-    try:
-        prompt = (
-            f"You are FarmAI, an expert agricultural advisory assistant.\n"
-            f"Language Context: {language}\n"
-            f"Page Context: {context}\n"
-            f"User Question: {msg}"
-        )
-        response = client.models.generate_content_stream(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
-        for chunk in response:
-            if chunk.text:
-                yield chunk.text
-    except Exception as e:
-        yield f"\n[AI Error: {str(e)}]"
+    prompt = (
+        f"You are FarmAI, an expert agricultural advisory assistant.\n"
+        f"Language Context: {language}\n"
+        f"Page Context: {context}\n"
+        f"User Question: {msg}"
+    )
+
+    success = False
+    for model_name in [PRIMARY_MODEL, FALLBACK_MODEL]:
+        try:
+            response = client.models.generate_content_stream(
+                model=model_name,
+                contents=prompt,
+            )
+            has_text = False
+            for chunk in response:
+                if chunk.text:
+                    has_text = True
+                    yield chunk.text
+
+            if has_text:
+                success = True
+                break
+        except Exception as e:
+            print(f"Stream error on {model_name}: {e}")
+            continue
+
+    if not success:
+        yield "\n[AI Error: Failed to generate response from Gemini API. Please verify your API key and quota.]"
 
 
 @csrf_exempt
